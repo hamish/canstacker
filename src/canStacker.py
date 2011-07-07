@@ -30,20 +30,33 @@ shape = rect(0,0, outerDepth, outerHeight)
 c.stroke(shape, cut)
 
 # Engrave top shelf outline, no slope
-left = canDiam+boardThickness+margin
-right = outerDepth
+topShelfLeft = float(canDiam+boardThickness+margin)
+topShelfRight = float(outerDepth)
+topShelfTop = float(outerHeight-canDiam)
+topShelfBottom = float(topShelfTop-boardThickness)
 if debug:
-    shape = rect(left, outerHeight-canDiam, 
-                 right, outerHeight-canDiam-boardThickness)
+    shape = rect(topShelfLeft, topShelfTop,
+                 topShelfRight, topShelfBottom)
     c.stroke(shape, vector_engrave)
 # engrave the tabs for the top shelf
+topShelfNumTabs = float(5)
+topShelfTabLength=(topShelfRight-topShelfLeft)/(2*topShelfNumTabs-1)
+for i in range(int(topShelfNumTabs)):
+    tabLeft = topShelfLeft+ (i*2)*topShelfTabLength
+    tabRight = tabLeft+topShelfTabLength
+    shape = rect(tabLeft, topShelfTop,
+                 tabRight, topShelfBottom)
+    c.stroke(shape, cut)
 
 # Engrave bottom shelf outline, no slope
-
-shape = rect(canDiam+boardThickness+margin, 
-             outerHeight-canDiam-boardThickness-canDiam, 
-             outerDepth, 
-             outerHeight-canDiam-boardThickness-canDiam-boardThickness)
+bottomShelfLeft = canDiam+boardThickness+margin
+bottomShelfRight =outerDepth
+bottomShelfTop = outerHeight-canDiam-boardThickness-canDiam
+bottomSheelfLeft =bottomShelfTop-boardThickness
+shape = rect(bottomShelfLeft, 
+             bottomShelfTop, 
+             bottomShelfRight, 
+             bottomSheelfLeft)
 c.stroke(shape, vector_engrave)
 
 #Engrave the inner arc
