@@ -48,10 +48,40 @@ for i in range(int(topShelfNumTabs)):
                  tabRight, topShelfBottom)
     c.stroke(shape, cut)
 
+### Cut the actual top shelf
+shelfCanvas = canvas.canvas()
+topshelfLength= outerDepth - (canDiam+boardThickness+margin)
+shape = rect(0,0, topshelfLength, outerWidth)
+shelfCanvas.stroke(shape, cut)
+
+for i in range(int(topShelfNumTabs-1)):
+    tabLeft = ((i)*2)*topShelfTabLength+topShelfTabLength
+    tabRight = tabLeft+topShelfTabLength
+    shape = rect(tabLeft, boardThickness,
+                 tabRight, 0)
+    shelfCanvas.stroke(shape, cut)
+    shape = rect(tabLeft, outerWidth,
+                 tabRight, outerWidth - boardThickness)
+    shelfCanvas.stroke(shape, cut)
+tabLeft = ((topShelfNumTabs)*2-1)*topShelfTabLength
+tabRight = topshelfLength
+
+shape = rect(tabLeft, boardThickness,
+                 tabRight, 0)
+shelfCanvas.stroke(shape, cut)
+shape = rect(tabLeft, outerWidth,
+                 tabRight, outerWidth - boardThickness)
+shelfCanvas.stroke(shape, cut)
+
+
+shelfCanvas.writePDFfile("output/TopShelf")
+
+
 # Engrave bottom shelf outline, no slope
 bottomShelfLeft = float(canDiam+boardThickness+margin)
 bottomShelfRight = float(outerDepth - 20)
-bottomShelfTop = float(outerHeight-canDiam-boardThickness-canDiam)
+bottomShelfTop = float(margin+boardThickness)
+#bottomShelfTop = float(outerHeight-canDiam-boardThickness-canDiam)
 bottomShelfBottom =float(bottomShelfTop-boardThickness)
 shape = rect(bottomShelfLeft, 
              bottomShelfTop, 
@@ -70,46 +100,93 @@ for i in range(int(bottomShelfNumTabs)):
 
 
 #Engrave the inner arc
-shape= path.path(path.arc(canDiam+boardThickness+margin, 
-                outerHeight-canDiam-boardThickness,
+arcCenterX= canDiam+boardThickness+margin
+arcCenterY=bottomShelfTop + canDiam
+
+shape= path.path(path.arc(arcCenterX, 
+                arcCenterY,
                 canDiam,
                 180, 
                 270))
 c.stroke(shape, vector_engrave)
 
 #Engrave the outer arc
-shape= path.path(path.arc(canDiam+boardThickness+margin, 
-                outerHeight-canDiam-boardThickness,
+shape= path.path(path.arc(arcCenterX, 
+                arcCenterY,
                 canDiam+boardThickness,
                 180, 
                 270))
 c.stroke(shape, vector_engrave)
                 
 #Engrave the top of the lower shelf
-shape = rect(margin, outerHeight-(canDiam/2), 
-             margin+boardThickness, outerHeight-canDiam-boardThickness)
+vertTop = float(outerHeight-(canDiam/2))
+#vertBottom = float(outerHeight-canDiam-boardThickness)
+vertBottom= float(margin+boardThickness+canDiam)
+shape = rect(margin, vertTop, 
+             margin+boardThickness, vertBottom)
 c.stroke(shape, vector_engrave)
 
 # Cut tabs for the vertical piece of the lower shelf
-
-top = float(outerHeight-(canDiam/2))
-bottom = float(outerHeight-canDiam-boardThickness)
-
-tabLength=(top-bottom)/3
+vertTabLength=(vertTop-vertBottom)/3
 # top cut
-shape = rect(margin, top, 
-             margin+boardThickness, top-tabLength)
+shape = rect(margin, vertTop, 
+             margin+boardThickness, vertTop-vertTabLength)
 c.stroke(shape, cut)
 # bottom cut
-shape = rect(margin, bottom+tabLength, 
-             margin+boardThickness, bottom)
+shape = rect(margin, vertBottom+vertTabLength, 
+             margin+boardThickness, vertBottom)
 c.stroke(shape, cut)
 
-if debug:
-    # Show a border for debug
-    pass
-    
+c.writePDFfile("output/Side")
+#c.writeEPSfile("output/Side")
 
-#c.writePDFfile("output/Side")
-c.writeEPSfile("output/Side")
+### Cut the actual bottom shelf
+backshelfCanvas = canvas.canvas()
+#backVert = canDiam/2+boardThickness
+backVert = vertTop - vertBottom
 
+backArc = 2*pi*canDiam/4
+backHorizontal=outerDepth - (canDiam+boardThickness+margin) 
+backshelfLength= backVert+backArc+backHorizontal
+shape = rect(0,0, backshelfLength, outerWidth)
+backshelfCanvas.stroke(shape, cut)
+
+for i in range(int(topShelfNumTabs-1)):
+    tabLeft = backVert+backArc+((i)*2)*topShelfTabLength+topShelfTabLength
+    tabRight = tabLeft+topShelfTabLength
+    shape = rect(tabLeft, boardThickness,
+                 tabRight, 0)
+    backshelfCanvas.stroke(shape, cut)
+    shape = rect(tabLeft, outerWidth,
+                 tabRight, outerWidth - boardThickness)
+    backshelfCanvas.stroke(shape, cut)
+tabLeft = backVert+backArc+((topShelfNumTabs)*2-1)*topShelfTabLength
+tabRight = backshelfLength
+
+shape = rect(tabLeft, boardThickness,
+                 tabRight, 0)
+backshelfCanvas.stroke(shape, cut)
+shape = rect(tabLeft, outerWidth,
+                 tabRight, outerWidth - boardThickness)
+backshelfCanvas.stroke(shape, cut)
+## vetical tabs
+shape = rect(vertTabLength, boardThickness,
+                 vertTabLength*2, 0)
+backshelfCanvas.stroke(shape, cut)
+
+shape = rect(vertTabLength, outerWidth,
+                 vertTabLength*2, outerWidth - boardThickness)
+backshelfCanvas.stroke(shape, cut)
+
+# cut out the arc
+shape = rect(backVert, boardThickness,
+             backVert+backArc, 0)
+backshelfCanvas.stroke(shape, cut)
+
+shape = rect(backVert, outerWidth,
+             backVert+backArc, outerWidth - boardThickness)
+backshelfCanvas.stroke(shape, cut)
+
+
+
+backshelfCanvas.writePDFfile("output/BottomShelf")
