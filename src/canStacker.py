@@ -40,17 +40,46 @@ class CanStackerParameters():
         self.UpperGateHeight=self.canDiameter/8
         self.cabinetHeight = float(400) # TODO - calculate this value
         
-        # lower shelf. Calculate based on minFingerDistance, then compare to minShelfAngle
-        self.lsBottomFrontX=self.cabinetDepth-self.frontGap
+        ##### Lower Shelf
+        self.lsBottomFrontX=self.cabinetDepth-self.margin
         self.lsBottomFrontY=self.margin
         
         self.lsBottomBackX=self.margin+self.boardThickness+self.backGap
+        print self.lsBottomFrontX
+        print self.lsBottomBackX
+        
         self.lsBottomXDistance = self.lsBottomFrontX-self.lsBottomBackX
         self.lsBottomBackY=tan(self.minShelfAngle)*self.lsBottomXDistance
         self.lsLength = trig.getHypotenuse(adjacent=self.lsBottomXDistance, angle=self.minShelfAngle)
+        self.lsRectangle=RotatableRectangle(
+            XDistance=-1*self.lsLength, 
+            YDistance=self.boardThickness,
+            origin=Point(self.lsBottomFrontX,self.lsBottomFrontY),
+            angle=-1*self.minShelfAngle
+                                           )
         
         
+        lgOrigin=self.lsRectangle.getPosD().clone()
+        lgOrigin.slide_xy(0,self.frontGap)
+        ##### Front Gate
+        self.lgRectangle=RotatableRectangle(
+            XDistance=-1*self.boardThickness, 
+            YDistance=self.lowerGateHeight,
+            origin=lgOrigin
+                                            )
         
+        ###### Top Shelf
+        self.tsBottomFront = self.lgRectangle.getPosD().clone()
+        self.tsBottomFront.slide_xy(0,self.canDiameter+self.minFingerDistance)
+        self.tsBottomBackX=self.margin+self.boardThickness+self.backGap+ self.canDiameter
+        self.tsHorizontalDistance = self.tsBottomFront.x-self.tsBottomBackX
+        self.tsLength = trig.getHypotenuse(adjacent=self.tsHorizontalDistance, angle=self.minShelfAngle)
+        self.tsRectangle=RotatableRectangle(
+            XDistance=-1*self.tsLength, 
+            YDistance=self.boardThickness,
+            origin=self.tsBottomFront,
+            angle=self.minShelfAngle
+                                           )
         
         
         self.lsTranslationDistanceX = cos(90-self.minShelfAngle)*self.boardThickness
@@ -84,15 +113,15 @@ def main():
     sideWall.stroke(shape, cut)
     
     #lower shelf
-    rectangle=RotatableRectangle(
-        XDistance=-1*params.lsLength, 
-        YDistance=params.boardThickness,
-        origin=Point(params.lsBottomFrontX,params.lsBottomFrontY),
-        angle=-1*params.minShelfAngle
-                                 )
-    shape = rectanglePath(rectangle)
-    sideWall.stroke(shape, vector_engrave)
-    
+    sideWall.stroke(rectanglePath(params.lsRectangle), vector_engrave)
+
+    #lower gate
+    sideWall.stroke(rectanglePath(params.lgRectangle), vector_engrave)
+
+    #top shelf
+    sideWall.stroke(rectanglePath(params.tsRectangle), vector_engrave)
+
+
     sideWall.writeEPSfile("output/SideWall")    
 
 if __name__ == "__main__":

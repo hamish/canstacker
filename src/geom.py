@@ -10,10 +10,10 @@ def rect(startx, starty, oppx, oppy):
               path.moveto(oppx, starty), path.lineto(startx, starty))
 
 def rectanglePath(rectangle):
-    a=rectangle.getPosA(); print a
-    b=rectangle.getPosB(); print b
-    c=rectangle.getPosC(); print c
-    d=rectangle.getPosD(); print d
+    a=rectangle.getPosA(); #print a
+    b=rectangle.getPosB(); #print b
+    c=rectangle.getPosC(); #print c
+    d=rectangle.getPosD(); #print d
     return path.path(
         path.moveto(a.x,a.y), path.lineto(b.x,b.y),
         path.moveto(b.x,b.y), path.lineto(c.x,c.y),
