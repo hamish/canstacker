@@ -40,17 +40,17 @@ class RotatableRectangle:
     def getPosB(self):
         intermediate=self.getPosA().clone()
         intermediate.slide_xy(self.XDistance, 0.0)
-        posB=intermediate.rotate_about(self.origin, self.angle)
+        posB=intermediate.rotate_about(self.origin.clone(), self.angle)
         return posB
     def getPosC(self):
-        intermediate = self.getPosB().clone()
-        intermediate.slide_xy(0.0, self.YDistance)
-        posC=intermediate.rotate_about(self.getPosB().clone(), self.angle)
+        intermediate = self.getPosA().clone()
+        intermediate.slide_xy(self.XDistance, self.YDistance)    
+        posC=intermediate.rotate_about(self.origin.clone(), self.angle)
         return posC
     def getPosD(self):
         intermediate=self.getPosA().clone()
         intermediate.slide_xy(0.0,self.YDistance)
-        posD=intermediate.rotate_about(self.origin, self.angle)
+        posD=intermediate.rotate_about(self.origin.clone(), self.angle)
         return posD
             
     def getVertices(self):

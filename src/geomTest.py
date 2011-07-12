@@ -25,6 +25,47 @@ class SimpleTest(unittest.TestCase):
         self.assertEqual(rectangle.getPosB(), Point(a,a))
         self.assertEqual(rectangle.getPosC(), Point(0.0,2*a))
         self.assertEqual(rectangle.getPosD(), Point(-1*a,a))
+
+    def testNoRotateNegRect(self):
+        rectangle=RotatableRectangle(XDistance=-1, YDistance=2)
+        v=rectangle.getVertices()
+        self.assertTrue(Point(0.0,0.0) in v)
+        self.assertEqual(rectangle.getPosA(), Point(0.0,0.0))
+        self.assertEqual(rectangle.getPosB(), Point(-1.0,0.0))
+        self.assertEqual(rectangle.getPosC(), Point(-1.0,2.0))
+        self.assertEqual(rectangle.getPosD(), Point(0.0,2.0))
+
+    def testRotate90NegRect(self):
+        rectangle=RotatableRectangle(XDistance=-1, YDistance=2, angle=90)
+        v=rectangle.getVertices()
+        expectedVertices = (Point(0.0,0.0),
+                            Point(0.0,-1.0), 
+                            Point(-2.0,-1.0), 
+                            Point(-2.0,0.0)
+                            )
+        self.assertEqual(v,expectedVertices)
+
+        self.assertEqual(rectangle.getPosA(), Point(0.0,0.0))
+        self.assertEqual(rectangle.getPosB(), Point(0.0,-1.0))
+        self.assertEqual(rectangle.getPosC(), Point(-2.0,-1.0))
+        self.assertEqual(rectangle.getPosD(), Point(-2.0,0.0))
+
+    def testRotateNeg90NegRect(self):
+        rectangle=RotatableRectangle(XDistance=-1, YDistance=2, angle=-90)
+        v=rectangle.getVertices()
+        expectedVertices = (Point(0.0,0.0),
+                            Point(0.0,1.0),
+                            Point(2.0,1.0),
+                            Point(2.0,0.0)
+                            )
+        self.assertEqual(v,expectedVertices)
+        
+        self.assertEqual(rectangle.getPosA(), Point(0.0,0.0) )
+        self.assertEqual(rectangle.getPosB(), Point(0.0,1.0) )
+        self.assertEqual(rectangle.getPosC(), Point(2.0,1.0) )
+        self.assertEqual(rectangle.getPosD(), Point(2.0,0.0) )
+
+
 if __name__ == "__main__":
     unittest.main()   
     
