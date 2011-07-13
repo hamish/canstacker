@@ -99,6 +99,12 @@ class CanStackerParameters():
             origin=bwOrigin
             )
 
+def strokeTabs(rectangle, canvas, mode, numTabs=3):
+    for tab in tabCuts(rectangle):
+        #print tab.origin
+        #print tab.XDistance
+        canvas.stroke(rectanglePath(tab), mode)
+        
 def main():
     #create parameters object
     params = CanStackerParameters()
@@ -113,22 +119,23 @@ def main():
     
     #lower shelf
     sideWall.stroke(rectanglePath(params.lsRectangle), vector_engrave)
-    for tab in tabCuts(params.lsRectangle):
-        #print tab.origin
-        #print tab.XDistance
-        sideWall.stroke(rectanglePath(tab), cut)
+    strokeTabs(params.lsRectangle, sideWall, cut)
 
     #lower gate
     sideWall.stroke(rectanglePath(params.lgRectangle), vector_engrave)
+    strokeTabs(params.lgRectangle, sideWall, cut)
 
     #top shelf
     sideWall.stroke(rectanglePath(params.tsRectangle), vector_engrave)
+    strokeTabs(params.tsRectangle, sideWall, cut)
 
     #top gate
     sideWall.stroke(rectanglePath(params.tgRectangle), vector_engrave)
+    strokeTabs(params.tgRectangle, sideWall, cut)
 
     #Back wall
     sideWall.stroke(rectanglePath(params.bwRectangle), vector_engrave)
+    strokeTabs(params.bwRectangle, sideWall, cut)
     
     sideWall.writeEPSfile("output/SideWall")    
 

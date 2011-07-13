@@ -20,7 +20,7 @@ def tabCuts(rectangle, numTabs=3):
     print "rectangle.angle=", rectangle.angle
     print
     for i in range(numTabs):
-        hyp = math.fabs(2*tabLength*i)
+        hyp = 2*tabLength*i
         adj=trig.getAdjacent(hypotenuse=hyp, angle=rectangle.angle)
         opp=trig.getOpposite(hypotenuse=hyp, angle=rectangle.angle)
         originX=rectangle.origin.x+ adj
@@ -33,7 +33,8 @@ def tabCuts(rectangle, numTabs=3):
         rect=RotatableRectangle(origin=origin,
                             XDistance=tabLength, 
                             YDistance=rectangle.YDistance, 
-                            angle=math.fabs(rectangle.angle))
+                            angle=rectangle.angle
+                            )
         result.append(rect)
     return result
     
