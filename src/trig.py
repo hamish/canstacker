@@ -32,11 +32,13 @@ class TrigTests(unittest.TestCase):
         self.assertEqual(getOpposite(hypotenuse=1, angle=0), 0.0)
 
     def testImpossibleCases(self):
-        with self.assertRaises(Exception):
+    	self.assertRaises(Exception, getHypotenuse, opposite=1, angle=0)
+        self.assertRaises(Exception, getHypotenuse, opposite=0, angle=0)
+        #with self.assertRaises(Exception):
             # angle=0 and opposite!=0 is not possible
-            getHypotenuse(opposite=1, angle=0)
+        #    getHypotenuse(opposite=1, angle=0)
             # hypotenuse for angle=0 and opposite!=0 is undefined            
-            getHypotenuse(opposite=0, angle=0)
+        #    getHypotenuse(opposite=0, angle=0)
 
 if __name__ == "__main__":
     unittest.main()   
