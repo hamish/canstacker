@@ -61,9 +61,10 @@ class CanStackerParameters():
         lgOrigin=self.lsRectangle.getPosD().clone()
         lgOrigin.slide_xy(0,self.frontGap)
         self.lgRectangle=RotatableRectangle(
-            XDistance=-1*self.boardThickness, 
-            YDistance=self.lowerGateHeight,
-            origin=lgOrigin
+            YDistance=self.boardThickness, 
+            XDistance=self.lowerGateHeight,
+            origin=lgOrigin,
+            angle=90 #Defined rotated so that tabs work correctly
                                             )
         
         ###### Top Shelf
@@ -82,9 +83,10 @@ class CanStackerParameters():
         tgOrigin=self.tsRectangle.getPosD().clone()
         tgOrigin.slide_xy(0,self.frontGap)
         self.tgRectangle=RotatableRectangle(
-            XDistance=-1*self.boardThickness, 
-            YDistance=self.upperGateHeight,
-            origin=tgOrigin
+            YDistance=self.boardThickness, 
+            XDistance=self.upperGateHeight,
+            origin=tgOrigin, 
+            angle=90
                                             )
         self.cabinetHeight = self.tgRectangle.getPosD().y + self.canDiameter
         
@@ -92,15 +94,16 @@ class CanStackerParameters():
         
         bwBottomY=self.lsRectangle.getPosC().y + self.backGap
         bwHeight=self.cabinetHeight - self.backGap - bwBottomY
-        bwOrigin = Point(self.margin, bwBottomY)
+        bwOrigin = Point(self.margin+self.boardThickness, bwBottomY)
         self.bwRectangle=RotatableRectangle(
-            XDistance=self.boardThickness, 
-            YDistance=bwHeight,
-            origin=bwOrigin
+            YDistance=self.boardThickness, 
+            XDistance=bwHeight,
+            origin=bwOrigin,
+            angle=90
             )
 
 def strokeTabs(rectangle, canvas, mode, numTabs=3):
-    for tab in tabCuts(rectangle):
+    for tab in tabCuts(rectangle, numTabs=numTabs):
         #print tab.origin
         #print tab.XDistance
         canvas.stroke(rectanglePath(tab), mode)
@@ -123,7 +126,7 @@ def main():
 
     #lower gate
     sideWall.stroke(rectanglePath(params.lgRectangle), vector_engrave)
-    strokeTabs(params.lgRectangle, sideWall, cut)
+    strokeTabs(params.lgRectangle, sideWall, cut, numTabs=2)
 
     #top shelf
     sideWall.stroke(rectanglePath(params.tsRectangle), vector_engrave)
@@ -131,13 +134,13 @@ def main():
 
     #top gate
     sideWall.stroke(rectanglePath(params.tgRectangle), vector_engrave)
-    strokeTabs(params.tgRectangle, sideWall, cut)
+    strokeTabs(params.tgRectangle, sideWall, cut, numTabs=2)
 
     #Back wall
     sideWall.stroke(rectanglePath(params.bwRectangle), vector_engrave)
     strokeTabs(params.bwRectangle, sideWall, cut)
     
-    sideWall.writeEPSfile("output/SideWall")    
+    sideWall.writePDFfile("output/SideWall")    
 
 if __name__ == "__main__":
     main()   
