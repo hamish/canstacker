@@ -35,10 +35,8 @@ class CanStackerParameters():
         self.backGap=float(10)
     
     
-        #Calculated Parameters
         self.lowerGateHeight=self.canDiameter/4
-        self.UpperGateHeight=self.canDiameter/8
-        self.cabinetHeight = float(400) # TODO - calculate this value
+        self.upperGateHeight=self.canDiameter/8
         
         ##### Lower Shelf
         self.lsBottomFrontX=self.cabinetDepth-self.margin
@@ -59,9 +57,9 @@ class CanStackerParameters():
                                            )
         
         
+        ##### Lower Gate
         lgOrigin=self.lsRectangle.getPosD().clone()
         lgOrigin.slide_xy(0,self.frontGap)
-        ##### Front Gate
         self.lgRectangle=RotatableRectangle(
             XDistance=-1*self.boardThickness, 
             YDistance=self.lowerGateHeight,
@@ -80,25 +78,26 @@ class CanStackerParameters():
             origin=self.tsBottomFront,
             angle=self.minShelfAngle
                                            )
+        ##### Top Gate
+        tgOrigin=self.tsRectangle.getPosD().clone()
+        tgOrigin.slide_xy(0,self.frontGap)
+        self.tgRectangle=RotatableRectangle(
+            XDistance=-1*self.boardThickness, 
+            YDistance=self.upperGateHeight,
+            origin=tgOrigin
+                                            )
+        self.cabinetHeight = self.tgRectangle.getPosD().y + self.canDiameter
         
+        #### Back Wall
         
-        self.lsTranslationDistanceX = cos(90-self.minShelfAngle)*self.boardThickness
-        self.lsTranslationDistanceY = sin(90-self.minShelfAngle)*self.boardThickness
-        self.lsTopFrontX=self.lsBottomFrontX+self.lsTranslationDistanceX
-        self.lsTopFrontY=self.lsBottomFrontY+self.lsTranslationDistanceY
-        self.lsTopBackX=self.lsBottomBackX+self.lsTranslationDistanceX
-        self.lsTopBackY=self.lsBottomBackY+self.lsTranslationDistanceY
-        
-        # Top Shelf
-        self.tsBottomBackX=self.margin+self.boardThickness+self.canDiameter+self.backGap
-        self.tsBottomBackY=self.lsTopBackY+self.canDiameter
-        self.tsBottomFrontX=self.cabinetDepth
-        self.tsBottomXDistance = self.tsBottomFrontX-self.tsBottomBackX
-        self.tsBottomFrontY= tan(self.minShelfAngle)*self.tsBottomXDistance
-        
-        #tan angle = Opposite/Adjacent
-
-
+        bwBottomY=self.lsRectangle.getPosC().y + self.backGap
+        bwHeight=self.cabinetHeight - self.backGap - bwBottomY
+        bwOrigin = Point(self.margin, bwBottomY)
+        self.bwRectangle=RotatableRectangle(
+            XDistance=self.boardThickness, 
+            YDistance=bwHeight,
+            origin=bwOrigin
+            )
 
 def main():
     #create parameters object
@@ -114,6 +113,10 @@ def main():
     
     #lower shelf
     sideWall.stroke(rectanglePath(params.lsRectangle), vector_engrave)
+    for tab in tabCuts(params.lsRectangle):
+        #print tab.origin
+        #print tab.XDistance
+        sideWall.stroke(rectanglePath(tab), cut)
 
     #lower gate
     sideWall.stroke(rectanglePath(params.lgRectangle), vector_engrave)
@@ -121,7 +124,12 @@ def main():
     #top shelf
     sideWall.stroke(rectanglePath(params.tsRectangle), vector_engrave)
 
+    #top gate
+    sideWall.stroke(rectanglePath(params.tgRectangle), vector_engrave)
 
+    #Back wall
+    sideWall.stroke(rectanglePath(params.bwRectangle), vector_engrave)
+    
     sideWall.writeEPSfile("output/SideWall")    
 
 if __name__ == "__main__":

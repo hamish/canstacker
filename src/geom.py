@@ -2,6 +2,7 @@ from pyx import *
 from math import *
 from geom import *
 from coordinates import *
+import trig
 
 def rect(startx, starty, oppx, oppy):
     return path.path(path.moveto(startx, starty), path.lineto(startx, oppy),
@@ -9,6 +10,33 @@ def rect(startx, starty, oppx, oppy):
               path.moveto(oppx, oppy), path.lineto(oppx, starty),
               path.moveto(oppx, starty), path.lineto(startx, starty))
 
+def tabCuts(rectangle, numTabs=3):
+    numPositions=(2*numTabs)-1
+    # at present cut in the rectangles original x dimension
+    tabLength = rectangle.XDistance/numPositions
+    result=[]
+    print "tabLength=", tabLength
+    print "rectangle.XDistance=", rectangle.XDistance
+    print "rectangle.angle=", rectangle.angle
+    print
+    for i in range(numTabs):
+        hyp = math.fabs(2*tabLength*i)
+        adj=trig.getAdjacent(hypotenuse=hyp, angle=rectangle.angle)
+        opp=trig.getOpposite(hypotenuse=hyp, angle=rectangle.angle)
+        originX=rectangle.origin.x+ adj
+        originY=rectangle.origin.y+ opp
+        origin=Point(originX, originY)
+        print "*** TAB ", i
+        print "hyp=", hyp
+        print "adj/opp", adj, "/", opp
+        print "origin=", origin
+        rect=RotatableRectangle(origin=origin,
+                            XDistance=tabLength, 
+                            YDistance=rectangle.YDistance, 
+                            angle=math.fabs(rectangle.angle))
+        result.append(rect)
+    return result
+    
 def rectanglePath(rectangle):
     a=rectangle.getPosA(); #print a
     b=rectangle.getPosB(); #print b
