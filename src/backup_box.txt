@@ -1,0 +1,89 @@
+from pyx import *
+from math import *
+
+unit.set(defaultunit="mm")
+
+debug =0
+
+# Outer dimensions of the cabinet
+outerHeight=178
+outerWidth=111+6
+outerDepth=390
+
+boardThickness = 3
+
+cut = [style.linewidth(0.02), color.rgb.red]
+raster_engrave= [style.linewidth(0.02), color.rgb.black]
+vector_engrave= [style.linewidth(0.02), color.rgb.blue]
+
+
+#Back Box
+
+def tabbedLine(x1,y1,x2,y2):
+    numTabs=3
+    numPositions=numTabs+2
+    x1=float(x1)
+    x2=float(x2)
+    y1=float(y1)
+    y2=float(y2)
+    xDiff=x2-x1
+    yDiff=y2-y1
+    xIncrement = xDiff/numPositions
+    yIncrement = yDiff/numPositions
+    theta=0
+    def nX(m):
+        return (xIncrement*m)+x1
+    def nY(m):
+        return (yIncrement*m)+y1
+    def nXp(m):
+        return nX(m)+boardThickness*cos(radians(theta))
+    def nYp(m):
+        return nY(m)+boardThickness*sin(radians(theta))
+    if x1 != x2:
+        theta = 90 - atan(radians(yDiff/xDiff))
+    currentTabDepth=0
+    for m in range(0, numPositions):
+       if (currentTabDepth==0):           
+           cutMarkers.append([nX(m), nY(m)])
+           cutMarkers.append([nX(m+1), nY(m+1)])
+           currentTabDepth=-1
+       else: 
+           cutMarkers.append([nXp(m), nYp(m)])
+           cutMarkers.append([nXp(m+1), nYp(m+1)])
+           currentTabDepth=0    
+ 
+    
+cutMarkers = []
+tabbedLine(0,0,0,outerWidth)
+tabbedLine(0,outerWidth,outerHeight,outerWidth)
+tabbedLine(outerHeight,outerWidth,outerHeight,0 )
+tabbedLine(outerHeight,0,0,0)
+
+#create the picture
+c = canvas.canvas()
+print"1,0-> %s,1\n\n" % (outerWidth)
+
+def line(a,b):
+    if a==b:
+        print "Skipping %s -> %s" % (a,b)
+    else:
+        print"%s-> %s" % (a,b)
+        c.stroke(path.line(a[0],a[1], b[0], b[1]), cut)
+    return b
+reduce (line, cutMarkers);
+
+if debug:
+    # Show a border for debug
+    c.stroke(path.line(-1,-1, outerWidth+1,-1), raster_engrave)
+    c.stroke(path.line(outerWidth+1,-1, outerWidth+1, outerHeight +1), raster_engrave)
+    
+    c.stroke(path.line(-1,-1, -1, outerHeight +1), raster_engrave)
+    c.stroke(path.line(-1, outerHeight +1, outerWidth+1, outerHeight +1), raster_engrave)
+
+# Label our work
+#c.text(outerHeight/2, outerWidth/2, r"boxcenter and flushcenter",
+#       [text.parbox(3), text.halign.boxcenter, text.halign.flushcenter])
+    
+
+c.writeEPSfile("output/BackPlane%d_%d_%d" % (outerHeight,outerWidth,outerDepth))
+#c.writePDFfile("output/BackPlane")
