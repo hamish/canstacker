@@ -10,6 +10,7 @@ unit.set(defaultunit="mm")
 cut = [style.linewidth(0.02), color.rgb.red]
 raster_engrave= [style.linewidth(0.02), color.rgb.black]
 vector_engrave= [style.linewidth(0.02), color.rgb.blue]
+draw_debug= [style.linewidth.Thick, style.linestyle.dashed, color.rgb.green]
 
 class CanStackerParameters():    
     def __init__(self):
@@ -24,15 +25,18 @@ class CanStackerParameters():
         # these have some extra room built in so we can create a  
         # space exactly canHeight or canDiameter and assume that 
         # a real can will fit.
-        self.canHeight=float(110)
+        self.canHeight=float(117)
         self.canDiameter=float(80)
         
         self.minFingerDistance=float(30)
-        self.minShelfAngle=float(2)
+        self.minShelfAngle=float(5)
         
         self.margin=float(7)
         self.frontGap=float(1)
         self.backGap=float(10)
+        
+        self.v2TabVertical=float(1.5)
+        self.v2TabHorizontal=float(1.5)
     
     
         self.lowerGateHeight=self.canDiameter/4
@@ -108,6 +112,48 @@ def strokeTabs(rectangle, canvas, mode, numTabs=3):
         #print tab.XDistance
         canvas.stroke(rectanglePath(tab), mode)
         
+        
+        #self.v2TabVertical
+        #self.v2TabHorizontal
+
+def makeV2Shelf(rectangle, filename, params, numTabs=3):
+    c = canvas.canvas()
+    #make outer rectangle
+    depth=math.fabs(rectangle.XDistance)
+    height=params.canHeight + (2*(params.boardThickness+params.v2TabHorizontal))+ params.v2TabVertical
+    outerRect=RotatableRectangle(
+            YDistance=depth, 
+            XDistance=height,
+            origin=Point(-1*params.v2TabVertical,0)
+            )
+    c.stroke(rectanglePath(outerRect), cut)
+    # Make Tabs
+    for tab in shelfTabs(depth, height, params.boardThickness, numTabs, verticalOffset=-1*params.v2TabVertical):
+        c.stroke(rectanglePath(tab), cut)
+    if params.debug:
+        c.stroke(path.path(path.moveto(0,0), path.lineto(0,40)), draw_debug)
+        c.stroke(path.path(path.moveto(0,0), path.lineto(40,0)), draw_debug)
+    c.writePDFfile("output/%s_v2"%filename)    
+
+def makeShelf(rectangle, filename, params, numTabs=3):
+    c = canvas.canvas()
+    #make outer rectangle
+    depth=math.fabs(rectangle.XDistance)
+    height=params.canHeight + (2*params.boardThickness)
+    outerRect=RotatableRectangle(
+            YDistance=depth, 
+            XDistance=height,
+            origin=Point(0,0)
+            )
+    c.stroke(rectanglePath(outerRect), cut)
+    # Make Tabs
+    for tab in shelfTabs(depth, height, params.boardThickness, numTabs):
+        c.stroke(rectanglePath(tab), cut)
+    if params.debug:
+        c.stroke(path.path(path.moveto(0,0), path.lineto(0,40)), draw_debug)
+        c.stroke(path.path(path.moveto(0,0), path.lineto(40,0)), draw_debug)
+    c.writePDFfile("output/%s_v1"%filename)    
+    
 def main():
     #create parameters object
     params = CanStackerParameters()
@@ -122,23 +168,31 @@ def main():
     
     #lower shelf
     sideWall.stroke(rectanglePath(params.lsRectangle), vector_engrave)
-    strokeTabs(params.lsRectangle, sideWall, cut)
+    strokeTabs(params.lsRectangle, sideWall, cut, numTabs=7)
+    makeShelf(params.lsRectangle, "lowershelf", params, numTabs=7)
 
     #lower gate
     sideWall.stroke(rectanglePath(params.lgRectangle), vector_engrave)
     strokeTabs(params.lgRectangle, sideWall, cut, numTabs=2)
-
+    makeShelf(params.lgRectangle, "lowergate", params, numTabs=2)
+    makeV2Shelf(params.lgRectangle, "lowergate", params, numTabs=2)
+    
     #top shelf
     sideWall.stroke(rectanglePath(params.tsRectangle), vector_engrave)
-    strokeTabs(params.tsRectangle, sideWall, cut)
-
+    strokeTabs(params.tsRectangle, sideWall, cut, numTabs=5)
+    makeShelf(params.tsRectangle, "topshelf", params, numTabs=5)
+    makeV2Shelf(params.tsRectangle, "topshelf", params, numTabs=5)
+    
     #top gate
     sideWall.stroke(rectanglePath(params.tgRectangle), vector_engrave)
     strokeTabs(params.tgRectangle, sideWall, cut, numTabs=2)
+    makeShelf(params.tgRectangle, "topgate", params, numTabs=2)
 
     #Back wall
     sideWall.stroke(rectanglePath(params.bwRectangle), vector_engrave)
-    strokeTabs(params.bwRectangle, sideWall, cut)
+    strokeTabs(params.bwRectangle, sideWall, cut, numTabs=5)
+    makeShelf(params.bwRectangle, "backwall", params, numTabs=5)
+    makeV2Shelf(params.bwRectangle, "backwall", params, numTabs=5)
     
     sideWall.writePDFfile("output/SideWall")    
 

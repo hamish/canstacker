@@ -10,6 +10,25 @@ def rect(startx, starty, oppx, oppy):
               path.moveto(oppx, oppy), path.lineto(oppx, starty),
               path.moveto(oppx, starty), path.lineto(startx, starty))
 
+def shelfTabs(depth, height, tabThickness, numTabs=3, verticalOffset=0):
+    numPositions=(2*numTabs)-1
+    tabLength=depth/numPositions
+    result=[]
+    for i in range(numTabs-1):
+    	o1 = Point(0,((2*i+1)*tabLength)+verticalOffset)
+    	print "****************tab %d, origin="%i , o1
+        rect=RotatableRectangle(
+            origin=o1,
+            XDistance=tabThickness,
+            YDistance=tabLength)
+        result.append(rect)
+        rect=RotatableRectangle(
+            origin=Point(height,(2*i+1)*tabLength),
+            XDistance=-1*tabThickness,
+            YDistance=tabLength)
+        result.append(rect)
+    return result
+        
 def tabCuts(rectangle, numTabs=3):
     numPositions=(2*numTabs)-1
     # at present cut in the rectangles original x dimension
